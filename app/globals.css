@@ -1,26 +1,109 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Colors - Injective Theme */
+  --color-background: #d4e0ff;
+  --color-foreground: #0B182B;
+
+  --color-card: #ffffff;
+  --color-card-foreground: #0B182B;
+
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0B182B;
+
+  --color-primary: #4F46E5;
+  --color-primary-foreground: #ffffff;
+
+  --color-secondary: #EEF2FF;
+  --color-secondary-foreground: #1e3a8a;
+
+  --color-muted: #EEF2FF;
+  --color-muted-foreground: #64748B;
+
+  --color-accent: #EEF2FF;
+  --color-accent-foreground: #0B182B;
+
+  --color-destructive: #EF4444;
+  --color-destructive-foreground: #ffffff;
+
+  --color-border: #E2E8F0;
+  --color-input: #E2E8F0;
+  --color-ring: #4F46E5;
+
+  /* Chart Colors */
+  --color-chart-1: #4F46E5;
+  --color-chart-2: #3B82F6;
+  --color-chart-3: #8B5CF6;
+  --color-chart-4: #EC4899;
+  --color-chart-5: #F59E0B;
+
+  /* Radii */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+  --radius-4xl: 3rem;
+
+  /* Fonts - Injective Style */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+/* Shadcn Variables Mapping */
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #F8F9FB;
+    --foreground: #0B182B;
+    --card: 255 255 255;
+    --card-foreground: #0B182B;
+    --popover: 255 255 255;
+    --popover-foreground: #0B182B;
+    --primary: #4F46E5;
+    --primary-foreground: #ffffff;
+    --secondary: #EEF2FF;
+    --secondary-foreground: #1e3a8a;
+    --muted: #EEF2FF;
+    --muted-foreground: #64748B;
+    --accent: #EEF2FF;
+    --accent-foreground: #0B182B;
+    --destructive: #EF4444;
+    --destructive-foreground: #ffffff;
+    --border: #E2E8F0;
+    --input: #E2E8F0;
+    --ring: #4F46E5;
+    --radius: 0.75rem;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    background-color: #F8F9FB;
+    color: #0B182B;
+  }
+}
+
+/* Custom Scrollbar for Light Theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
