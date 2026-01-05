@@ -208,6 +208,95 @@ export async function GET() {
             ]
         }
 
+
+        // ... (Keep existing API fetch logic above)
+
+        // 3. FILLER MOCK EVENTS (To ensure calendar is not empty)
+        // Generate random events for every day of the current + next month to make the demo look rich
+        const mockTitles = [
+            "DeFi Warrior Sync", "Validator Community Call", "Ninja Pass Giveaway",
+            "Rust Smart Contract Security", "CosmWasm Workshop", "Injective Flagship Space",
+            "Trading Guild Meetup", "Volan Upgrade Prep", "Governance Office Hours",
+            "Mito Finance Launch Party", "Helix Trading Competition", "Hydro Protocol Staking",
+            "Dojo Swap AMA", "Black Panther Vault Update", "Talis Protocol NFT Drop"
+        ]
+
+        const mockDescriptions = [
+            "Join us for an deep dive into the latest protocol updates.",
+            "Community gathering to discuss the future of finance on Injective.",
+            "Learn how to build next-gen dApps with CosmWasm.",
+            "Weekly sync with the core developer team.",
+            "Special guest appearance by industry leaders."
+        ]
+
+        const mockLocations = [
+            "Discord Stage", "Twitter Space", "Zoom", "Injective Hub",
+            "Metaverse", "Telegram Group", "Google Meet"
+        ]
+
+        const mockImages = [
+            "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=600&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1540575861501-7c00117f72ad?q=80&w=600&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=600&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=600&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?q=80&w=600&auto=format&fit=crop"
+        ]
+
+        const eventColors = ["purple", "green", "red", "blue", "yellow", "orange"]
+
+        // Helper to generate events for a specific month
+        const generateMonthEvents = (year: number, month: number) => {
+            const daysInMonth = new Date(year, month + 1, 0).getDate()
+            const generated = []
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                // Determine number of events for this day (1 to 3)
+                const numEvents = Math.floor(Math.random() * 2) + 1 // 1 or 2 events per day on average
+                // Verify if we already have API events for this day to avoid too much noise? 
+                // Actually user requested "every day", so we add on top.
+
+                for (let i = 0; i < numEvents; i++) {
+                    const startHour = 9 + Math.floor(Math.random() * 12) // 9 AM to 9 PM
+                    const durationH = 1 + Math.floor(Math.random() * 2) // 1-3 hours
+
+                    const randomTitle = mockTitles[Math.floor(Math.random() * mockTitles.length)]
+                    const randomDesc = mockDescriptions[Math.floor(Math.random() * mockDescriptions.length)]
+                    const randomLoc = mockLocations[Math.floor(Math.random() * mockLocations.length)]
+                    const randomImg = mockImages[Math.floor(Math.random() * mockImages.length)]
+                    const randomColor = eventColors[Math.floor(Math.random() * eventColors.length)]
+
+                    generated.push({
+                        id: `mock-${year}-${month}-${day}-${i}`,
+                        title: randomTitle,
+                        description: randomDesc,
+                        startTime: new Date(year, month, day, startHour, 0).toISOString(),
+                        endTime: new Date(year, month, day, startHour + durationH, 0).toISOString(),
+                        category: "Community",
+                        tags: ["Mock", "Demo"],
+                        color: randomColor,
+                        location: randomLoc,
+                        imageUrl: randomImg
+                    })
+                }
+            }
+            return generated
+        }
+
+        // Generate for current month and next month
+        const currentYear = sNow.getFullYear()
+        const currentMonth = sNow.getMonth()
+        const fillerEvents = [
+            ...generateMonthEvents(currentYear, currentMonth),
+            ...generateMonthEvents(currentYear, currentMonth + 1) // Also fill next month
+        ]
+
+        // Combine API events with filler events
+        // We prioritize API events (inserted first) but user wants abundance
+        const allEvents = [...communityEvents, ...fillerEvents]
+
+        // ... (Response construction)
         const response = {
             success: true,
             data: {
@@ -223,7 +312,7 @@ export async function GET() {
                     proposals: finalProposals
                 },
                 community: {
-                    events: communityEvents
+                    events: allEvents
                 }
             },
             timestamp: new Date().toISOString()
