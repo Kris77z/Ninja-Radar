@@ -55,69 +55,127 @@ export async function GET() {
 
         const sNow = new Date()
 
-        // 1. COMMUNITY EVENTS (Showcase)
-        const communityEvents = [
-            {
-                id: "comm-1",
-                title: "Ninja Labs Developer Workshop",
-                description: "Deep dive into Injective SDK and smart contract development. Perfect for building the next big dApp.",
-                startTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() + 1, 14, 0).toISOString(),
-                endTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() + 1, 17, 0).toISOString(),
-                category: "Developer",
-                tags: ["Education", "SDK"],
-                color: "purple",
-                location: "Global Cosmos Hub (Virtual)",
-                imageUrl: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=600&auto=format&fit=crop"
-            },
-            {
-                id: "comm-2",
-                title: "Ecosystem Online Sharing",
-                description: "Weekly call with ecosystem projects to share updates and collaborate on the future of Ninja network.",
-                startTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() - 1, 10, 0).toISOString(),
-                endTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() - 1, 12, 0).toISOString(),
-                category: "Community",
-                tags: ["Sharing", "Projects"],
-                color: "green",
-                location: "Injective Discord Level 3",
-                imageUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&auto=format&fit=crop"
-            },
-            {
-                id: "comm-3",
-                title: "iBuild Hackathon: Final Demo Day",
-                description: "The big day! Watch the best projects pitch to judges and win grants.",
-                startTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() + 5, 9, 30).toISOString(),
-                endTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() + 5, 20, 0).toISOString(),
-                category: "Hackathon",
-                tags: ["Grants", "Demo"],
-                color: "red",
-                location: "OpenBuild Main Stage",
-                imageUrl: "https://images.unsplash.com/photo-1540575861501-7c00117f72ad?q=80&w=600&auto=format&fit=crop"
-            },
-            {
-                id: "comm-4",
-                title: "Ambassador Sync Call",
-                description: "Coordinate with Injective ambassadors worldwide for local community growth.",
-                startTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() + 2, 16, 0).toISOString(),
-                endTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() + 2, 17, 30).toISOString(),
-                category: "Community",
-                tags: ["Global", "Coordination"],
-                color: "blue",
-                location: "Zoom HQ Online",
-                imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop"
-            },
-            {
-                id: "comm-5",
-                title: "Newbie Friendly: Injective 101",
-                description: "Introduction to the Injective ecosystem for new Ninjas. Learn how to stake and use DEXs.",
-                startTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() - 3, 21, 0).toISOString(),
-                endTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() - 3, 22, 30).toISOString(),
-                category: "Education",
-                tags: ["Newbie Friendly", "Basics"],
-                color: "yellow",
-                location: "Injective Academy",
-                imageUrl: "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=600&auto=format&fit=crop"
+        // 1. COMMUNITY EVENTS (Dynamic from Injective API)
+        let communityEvents: any[] = []
+        try {
+            const eventsRes = await fetch('https://injective.com/api/cache/events/list?page=1&pageSize=10', {
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36',
+                    'Referer': 'https://injective.com/events'
+                },
+                next: { revalidate: 3600 }
+            })
+
+            if (eventsRes.ok) {
+                const json = await eventsRes.json()
+                if (json.data && Array.isArray(json.data)) {
+                    communityEvents = json.data.map((item: any, index: number) => {
+                        // Date Adjustment for Demo: Project past events to current year
+                        // "2025-08-15"
+                        let eventDate = new Date()
+                        if (item.date) {
+                            const parsedDate = new Date(item.date)
+                            if (!isNaN(parsedDate.getTime())) {
+                                eventDate = parsedDate
+                                eventDate.setFullYear(sNow.getFullYear()) // Project to current year
+                            }
+                        }
+
+                        // Set basic time (default 14:00)
+                        eventDate.setHours(14, 0, 0)
+
+                        // Extract Image with Fallback
+                        // Path: thumbnail.formats.large.url
+                        const img = item.thumbnail?.formats?.large?.url
+                            || item.thumbnail?.formats?.medium?.url
+                            || item.thumbnail?.formats?.small?.url
+                            || item.thumbnail?.url
+                            || "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=600&auto=format&fit=crop"
+
+                        return {
+                            id: `comm-api-${item.id}`,
+                            title: item.title,
+                            description: item.excerpt || item.title,
+                            startTime: eventDate.toISOString(),
+                            endTime: new Date(eventDate.getTime() + 7200000).toISOString(),
+                            category: "Community",
+                            tags: item.tags || ["Event"],
+                            color: ["purple", "green", "red", "blue", "yellow"][index % 5],
+                            location: item.location || "Online",
+                            imageUrl: img
+                        }
+                    })
+                }
             }
-        ]
+        } catch (e) {
+            console.error("Failed to fetch Injective events:", e)
+        }
+
+        // Fallback if API fails or returns empty
+        if (communityEvents.length === 0) {
+            communityEvents = [
+                {
+                    id: "comm-1",
+                    title: "Ninja Labs Developer Workshop",
+                    description: "Deep dive into Injective SDK and smart contract development. Perfect for building the next big dApp.",
+                    startTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() + 1, 14, 0).toISOString(),
+                    endTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() + 1, 17, 0).toISOString(),
+                    category: "Developer",
+                    tags: ["Education", "SDK"],
+                    color: "purple",
+                    location: "Global Cosmos Hub (Virtual)",
+                    imageUrl: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=600&auto=format&fit=crop"
+                },
+                {
+                    id: "comm-2",
+                    title: "Ecosystem Online Sharing",
+                    description: "Weekly call with ecosystem projects to share updates and collaborate on the future of Ninja network.",
+                    startTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() - 1, 10, 0).toISOString(),
+                    endTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() - 1, 12, 0).toISOString(),
+                    category: "Community",
+                    tags: ["Sharing", "Projects"],
+                    color: "green",
+                    location: "Injective Discord Level 3",
+                    imageUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&auto=format&fit=crop"
+                },
+                {
+                    id: "comm-3",
+                    title: "iBuild Hackathon: Final Demo Day",
+                    description: "The big day! Watch the best projects pitch to judges and win grants.",
+                    startTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() + 5, 9, 30).toISOString(),
+                    endTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() + 5, 20, 0).toISOString(),
+                    category: "Hackathon",
+                    tags: ["Grants", "Demo"],
+                    color: "red",
+                    location: "OpenBuild Main Stage",
+                    imageUrl: "https://images.unsplash.com/photo-1540575861501-7c00117f72ad?q=80&w=600&auto=format&fit=crop"
+                },
+                {
+                    id: "comm-4",
+                    title: "Ambassador Sync Call",
+                    description: "Coordinate with Injective ambassadors worldwide for local community growth.",
+                    startTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() + 2, 16, 0).toISOString(),
+                    endTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() + 2, 17, 30).toISOString(),
+                    category: "Community",
+                    tags: ["Global", "Coordination"],
+                    color: "blue",
+                    location: "Zoom HQ Online",
+                    imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop"
+                },
+                {
+                    id: "comm-5",
+                    title: "Newbie Friendly: Injective 101",
+                    description: "Introduction to the Injective ecosystem for new Ninjas. Learn how to stake and use DEXs.",
+                    startTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() - 3, 21, 0).toISOString(),
+                    endTime: new Date(sNow.getFullYear(), sNow.getMonth(), sNow.getDate() - 3, 22, 30).toISOString(),
+                    category: "Education",
+                    tags: ["Newbie Friendly", "Basics"],
+                    color: "yellow",
+                    location: "Injective Academy",
+                    imageUrl: "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=600&auto=format&fit=crop"
+                }
+            ]
+        }
 
         // 2. GOVERNANCE (Merge real + mock)
         let finalProposals = realProposals.map((p: any) => ({
