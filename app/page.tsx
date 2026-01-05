@@ -53,7 +53,7 @@ export default function Home() {
         category: "Auction",
         tags: ["Deflationary", "System"],
         location: "Injective Burn Module",
-        imageUrl: "https://images.unsplash.com/photo-1620712943543-bcc4628c9757?q=80&w=2000&auto=format&fit=crop"
+        imageUrl: "https://images.unsplash.com/photo-1620712943543-bcc4628c9757?q=80&w=600&auto=format&fit=crop"
       } as any)
     }
 
@@ -74,7 +74,7 @@ export default function Home() {
           category: "Governance",
           tags: ["Vote", "DAO"],
           location: p.location || "On-chain Governance",
-          imageUrl: p.imageUrl || "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2832&auto=format&fit=crop"
+          imageUrl: p.imageUrl || "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=600&auto=format&fit=crop"
         } as any)
       })
     }
@@ -92,7 +92,7 @@ export default function Home() {
           category: e.category,
           tags: e.tags,
           location: e.location || "Global Virtual",
-          imageUrl: e.imageUrl || "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2000&auto=format&fit=crop"
+          imageUrl: e.imageUrl || "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=600&auto=format&fit=crop"
         } as any)
       })
     }
@@ -284,7 +284,7 @@ export default function Home() {
               distance={hoveredEvent.tags?.[0] || "Network"}
               elevation={hoveredEvent.tags?.[1] || "Active"}
               duration={Math.max(1, Math.round(Math.abs(hoveredEvent.endTime.getTime() - hoveredEvent.startTime.getTime()) / 3600000)) + "h"}
-              imageUrl={(hoveredEvent as any).imageUrl || "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2832&auto=format&fit=crop"}
+              imageUrl={(hoveredEvent as any).imageUrl || "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=600&auto=format&fit=crop"}
               mapImageUrl="https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?q=80&w=200&auto=format&fit=crop"
               className="w-80 shadow-2xl border-2 border-white"
             />
