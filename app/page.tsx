@@ -285,7 +285,7 @@ export default function Home() {
               elevation={hoveredEvent.tags?.[1] || "Active"}
               duration={Math.max(1, Math.round(Math.abs(hoveredEvent.endTime.getTime() - hoveredEvent.startTime.getTime()) / 3600000)) + "h"}
               imageUrl={(hoveredEvent as any).imageUrl || "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2832&auto=format&fit=crop"}
-              mapImageUrl="https://www.thiings.co/_next/image?url=https%3A%2F%2Flftz25oez4aqbxpq.public.blob.vercel-storage.com%2Fimage-3JYNLpogg5zknunPABpdOpEjJmZN5R.png&w=320&q=75"
+              mapImageUrl="https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?q=80&w=200&auto=format&fit=crop"
               className="w-80 shadow-2xl border-2 border-white"
             />
           </motion.div>
